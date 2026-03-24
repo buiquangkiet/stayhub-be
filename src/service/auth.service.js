@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (name, email, password) => {
     const isExist = await User.findOne({ email });
@@ -19,18 +20,21 @@ const generateToken = (user) => {
 };
 
 const login = async (email, password) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-        throw new Error("User not found");
-    }
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new Error("User not found");
+        }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        throw new Error("Invalid password");
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new Error("Invalid password");
+        }
+        const token = generateToken(user);
+        return { name: user.name, email: user.email, token };
+    } catch (error) {
+        throw error;
     }
-
-    const token = generateToken(user);
-    return { name: user.name, email: user.email, id: user._id, token };
 };
 
 const forgotPassword = async (email) => {
@@ -43,7 +47,7 @@ const forgotPassword = async (email) => {
     return { name: user.name, email: user.email, id: user._id, token };
 }
 
-const resetPassword = async (email) => {
+const resetPassword = async (email, password) => {
     const user = await User.findOne({ email });
     if (!user) {
         throw new Error("User not found");
@@ -57,4 +61,4 @@ const resetPassword = async (email) => {
     return { name: user.name, email: user.email, id: user._id };
 };
 
-module.exports = { createUser, generateToken, resetPassword, forgotPassword };
+module.exports = { createUser, generateToken, resetPassword, forgotPassword, login };
