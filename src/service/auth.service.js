@@ -2,7 +2,13 @@ const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const createUser = async (name, email, password) => {
+
+const generateToken = (user) => {
+    console.log(user.role)
+    return jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+}
+
+const createUser = async (name, email, password, role) => {
     const isExist = await User.findOne({ email });
     if (isExist) {
         throw new Error("User already exists");
@@ -10,13 +16,9 @@ const createUser = async (name, email, password) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashedPassword });
+    const user = await User.create({ name, email, password: hashedPassword, role: role || "customer" });
 
     return { name: user.name, email: user.email, id: user._id };
-};
-
-const generateToken = (user) => {
-    return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
 const login = async (email, password) => {
@@ -25,7 +27,9 @@ const login = async (email, password) => {
         if (!user) {
             throw new Error("User not found");
         }
-
+        if (!user.isActive) {
+            throw new Error("User is not active");
+        }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error("Invalid password");
@@ -61,4 +65,5 @@ const resetPassword = async (email, password) => {
     return { name: user.name, email: user.email, id: user._id };
 };
 
-module.exports = { createUser, generateToken, resetPassword, forgotPassword, login };
+
+module.exports = { createUser, resetPassword, forgotPassword, login };

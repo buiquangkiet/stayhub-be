@@ -1,17 +1,34 @@
 const jwt = require("jsonwebtoken");
 
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization;
-    if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: "Forbidden" });
+
+const authMiddleware = (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        
+        if (!authHeader) {
+            return res.status(401).json({ message: "Unauthorized: Không tìm thấy Token" });
         }
-        req.user = user;
-        next();
-    });
+
+        const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) {
+                return res.status(403).json({ 
+                    message: "Forbidden: Token không hợp lệ hoặc đã hết hạn!",
+                    error: err.message 
+                });
+            }
+            
+            req.user = decoded;
+            next();
+        });
+    } catch (error) {
+        console.error("[AuthMiddleware Error]:", error);
+        return res.status(500).json({
+            message: "Internal Server Error: Lỗi xác thực hệ thống",
+            error: error.message,
+        });
+    }
 }
 
-module.exports = { verifyToken };
+module.exports = { authMiddleware }; 

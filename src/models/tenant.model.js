@@ -1,32 +1,40 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-    tenantId: {
+const tenantSchema = new mongoose.Schema({
+    roomId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Tenant",
+        ref: "Room",
+        required: true,
     },
-    name: {
+    fullName: {
         type: String,
         required: true,
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
+    phone: {
         type: String,
         required: true,
     },
-    role: {
+    address: {
         type: String,
-        enum: ["owner", "customer"],
-        default: "customer",
+        required: true,
+    },
+    idCard: {
+        type: String,
+        required: true,
+    },
+    deposit: {
+        type: Number,
     },
     isActive: {
         type: Boolean,
         default: true,
     },
+    startDate: {
+        type: Date,
+    },
+    endDate: {
+        type: Date,
+    },
 }, { timestamps: true });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Tenant", tenantSchema);

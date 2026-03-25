@@ -10,6 +10,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/users", require("./routes/user.route"));
+app.use("/api/tenant", require("./routes/tenant.route"));
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
