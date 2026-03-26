@@ -1,5 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const dns = require("node:dns");
+dns.setDefaultResultOrder("ipv4first");
+dns.setServers(["8.8.8.8"]);
 dotenv.config();
 
 const connectDB = require("./utils/db");
