@@ -4,7 +4,6 @@ const roomSchema = new mongoose.Schema({
     tenantId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Tenant",
-        required: true,
     },
     roomNumber: {
         type: String,
@@ -22,6 +21,10 @@ const roomSchema = new mongoose.Schema({
         type: String,
         enum: ["empty", "occupied"],
         default: "empty",
+    },
+    isAvailable: {
+        type: Boolean,
+        default: true,
     },
 }, { timestamps: true });
 
