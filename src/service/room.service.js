@@ -1,13 +1,9 @@
 const tenantService = require("./tenant.service");
 const Room = require("../models/room.model");
 
-const createRoom = async (tenantId, roomNumber, price, type) => {
+const createRoom = async (roomNumber, price, type, imgSrc) => {
     try {
-        tenantId = await tenantService.getTenantById(tenantId);
-        if(!tenantId){
-            throw new Error("Tenant not found");
-        }
-        const room = await Room.create({ tenantId, roomNumber, price, type });
+        const room = await Room.create({ roomNumber, price, type, imgSrc });
         return room;
     } catch (error) {
         throw error({
@@ -16,6 +12,18 @@ const createRoom = async (tenantId, roomNumber, price, type) => {
         });
     }   
 }   
+
+const listAllRoom = async () => {
+    try {
+        const rooms = await Room.find();
+        return rooms;
+    } catch (error) {
+        throw error({
+            message: "Error listing rooms",
+            error: error.message,
+        });
+    }
+}
 
 const getRoomById = async (roomId) => {
     try {
@@ -53,4 +61,4 @@ const softDeleteRoom = async (roomId) => {
     }
 }
 
-module.exports = { createRoom, getRoomById, updateRoom, updateRoomAvailability };
+module.exports = { createRoom, listAllRoom, getRoomById, updateRoom, softDeleteRoom };

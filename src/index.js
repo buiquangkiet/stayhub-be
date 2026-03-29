@@ -11,10 +11,11 @@ connectDB();
 
 const app = express();
 
+const route = require("./routes");
+
 app.use(express.json());
 
-app.use("/api/users", require("./routes/user.route"));
-app.use("/api/tenant", require("./routes/tenant.route"));
+app.use("/api", route);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
