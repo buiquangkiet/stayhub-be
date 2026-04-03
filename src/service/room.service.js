@@ -10,8 +10,8 @@ const createRoom = async (roomNumber, price, type, imgSrc) => {
             message: "Error creating room",
             error: error.message,
         });
-    }   
-}   
+    }
+}
 
 const listAllRoom = async () => {
     try {
@@ -37,21 +37,18 @@ const getRoomById = async (roomId) => {
     }
 }
 
-const updateRoom = async (roomId, roomNumber, price, type) => {
+const updateRoom = async (id, { roomNumber, price, type }) => {
     try {
-        const room = await Room.findByIdAndUpdate(roomId, { roomNumber, price, type }, { new: true });
+        const room = await Room.findByIdAndUpdate(id, { roomNumber, price, type }, { new: true });
         return room;
     } catch (error) {
-        throw error({
-            message: "Error updating room",
-            error: error.message,
-        });
+        throw Error("Error updating room");
     }
 }
 
-const softDeleteRoom = async (roomId) => {
+const softDeleteRoom = async (id) => {
     try {
-        const room = await Room.findByIdAndUpdate(roomId, { isAvailable: false }, { new: true });
+        const room = await Room.findByIdAndUpdate(id, { isAvailable: false }, { new: true });
         return room;
     } catch (error) {
         throw error({
@@ -61,4 +58,16 @@ const softDeleteRoom = async (roomId) => {
     }
 }
 
-module.exports = { createRoom, listAllRoom, getRoomById, updateRoom, softDeleteRoom };
+const detail = async (id) => {
+    try {
+        const room = await Room.findById(id);
+        return room;
+    } catch (error) {
+        throw error({
+            message: "Error getting room detail",
+            error: error.message,
+        });
+    }
+}
+
+module.exports = { createRoom, listAllRoom, getRoomById, updateRoom, softDeleteRoom, detail };

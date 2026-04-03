@@ -13,6 +13,15 @@ const createUser = async (req, res) => {
     }
 }
 
+const list = async (req, res) => {
+    try {
+        const users = await authService.list();
+        res.status(200).json({ message: "Users fetched successfully", users });
+    } catch (error) {
+        res.status(409).json({ message: error.message });
+    }
+}
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -52,4 +61,4 @@ const changePassword = async (req, res) => {
     }
 }
 
-module.exports = { createUser, changePassword, login, forgotPassword };
+module.exports = { createUser, changePassword, login, forgotPassword, list };

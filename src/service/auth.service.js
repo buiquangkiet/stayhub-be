@@ -16,10 +16,19 @@ const createUser = async (name, email, password, role) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashedPassword, role: role || "customer" });
+    const user = await User.create({ name, email, password: hashedPassword, role });
 
     return { name: user.name, email: user.email, id: user._id };
 };
+
+const list = async () => {
+    try {
+        const users = await User.find();
+        return users;
+    } catch (error) {
+        throw error;
+    }
+}
 
 const login = async (email, password) => {
     try {
@@ -35,6 +44,7 @@ const login = async (email, password) => {
             throw new Error("Invalid password");
         }
         const token = generateToken(user);
+        console.log("User logined", { name: user.name, email: user.email, role: user.role })
         return { name: user.name, email: user.email, token };
     } catch (error) {
         throw error;
@@ -66,4 +76,4 @@ const resetPassword = async (email, password) => {
 };
 
 
-module.exports = { createUser, resetPassword, forgotPassword, login };
+module.exports = { createUser, resetPassword, forgotPassword, login, list };

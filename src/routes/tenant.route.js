@@ -2,13 +2,11 @@ const express = require("express");
 const router = express.Router();
 const tenantController = require("../controllers/tenant.controller");
 
-const { authMiddleware } = require("../middleware/auth.middleware");
+const { authMiddleware, verifyAdmin } = require("../middleware/auth.middleware");
 
-router.post("/create", tenantController.createTenant);
-
-router.get("/list", tenantController.listTenant);
-
-router.put("/update/:id", authMiddleware, tenantController.updateTenant);
-router.put("/delete/:id", authMiddleware, tenantController.softDeleteTenant);
+router.post("/create", authMiddleware, verifyAdmin, tenantController.createTenant);
+router.get("/list", authMiddleware, verifyAdmin, tenantController.listTenant);
+router.put("/update/:id", authMiddleware, verifyAdmin, tenantController.updateTenant);
+router.put("/delete/:id", authMiddleware, verifyAdmin, tenantController.softDeleteTenant);
 
 module.exports = router;

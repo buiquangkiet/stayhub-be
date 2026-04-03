@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const userController = require('../controllers/user.controller')
+const {verifyAdmin, authMiddleware} = require('../middleware/auth.middleware')
 
-router.post("/create", userController.createUser);
+router.post("/create",authMiddleware, verifyAdmin, userController.createUser);
+router.get("/list",authMiddleware, verifyAdmin, userController.list);
 router.post("/login", userController.login);
-router.post("/change-password", userController.changePassword);
-router.post("/forgot-password", userController.forgotPassword);
-
-
+router.post("/change-password",authMiddleware, userController.changePassword);
+router.post("/forgot-password",authMiddleware, userController.forgotPassword);
 
 module.exports = router;

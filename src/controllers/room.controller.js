@@ -31,9 +31,9 @@ const getRoomById = async (req, res) => {
 
 const updateRoom = async (req, res) => {
     try {
-        const { roomId } = req.params;
+        const { id } = req.params;
         const { roomNumber, price, type } = req.body;
-        const room = await roomService.updateRoom(roomId, roomNumber, price, type);
+        const room = await roomService.updateRoom(id, { roomNumber, price, type });
         res.status(200).json(room);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -42,12 +42,22 @@ const updateRoom = async (req, res) => {
 
 const softDeleteRoom = async (req, res) => {
     try {
-        const { roomId } = req.params;
-        const room = await roomService.softDeleteRoom(roomId);
+        const { id } = req.params;
+        const room = await roomService.softDeleteRoom(id);
         res.status(200).json(room);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-module.exports = { createRoom, listAllRoom, getRoomById, updateRoom, softDeleteRoom };
+const detail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const room = await roomService.detail(id);
+        res.status(200).json(room);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = { createRoom, listAllRoom, getRoomById, updateRoom, softDeleteRoom, detail };
