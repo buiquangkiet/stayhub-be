@@ -13,11 +13,8 @@ const createUser = async (name, email, password, role) => {
     if (isExist) {
         throw new Error("User already exists");
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({ name, email, password: hashedPassword, role });
-
     return { name: user.name, email: user.email, id: user._id };
 };
 
@@ -56,7 +53,6 @@ const forgotPassword = async (email) => {
     if (!user) {
         throw new Error("User not found");
     }
-
     const token = generateToken(user);
     return { name: user.name, email: user.email, id: user._id, token };
 }
@@ -66,9 +62,7 @@ const resetPassword = async (email, password) => {
     if (!user) {
         throw new Error("User not found");
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
     user.password = hashedPassword;
     await user.save();
 

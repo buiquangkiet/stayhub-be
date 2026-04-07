@@ -2,8 +2,8 @@ const roomService = require("../service/room.service");
 
 const createRoom = async (req, res) => {
     try {
-        const { roomNumber, price, type, imgSrc } = req.body;
-        const room = await roomService.createRoom(roomNumber, price, type, imgSrc);
+        const { roomNumber, price, variant, imgSrc } = req.body;
+        const room = await roomService.createRoom(roomNumber, price, variant, imgSrc);
         res.status(201).json(room);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -12,7 +12,8 @@ const createRoom = async (req, res) => {
 
 const listAllRoom = async (req, res) => {
     try {
-        const rooms = await roomService.listAllRoom();
+        const filter = req.query;
+        const rooms = await roomService.listAllRoom(filter);
         res.status(200).json(rooms);
     } catch (error) {
         res.status(500).json({ message: error.message });

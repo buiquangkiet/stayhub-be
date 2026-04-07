@@ -1,9 +1,9 @@
 const tenantService = require("./tenant.service");
 const Room = require("../models/room.model");
 
-const createRoom = async (roomNumber, price, type, imgSrc) => {
+const createRoom = async (roomNumber, price, variant, imgSrc) => {
     try {
-        const room = await Room.create({ roomNumber, price, type, imgSrc });
+        const room = await Room.create({ roomNumber, price, variant, imgSrc });
         return room;
     } catch (error) {
         throw error({
@@ -13,9 +13,23 @@ const createRoom = async (roomNumber, price, type, imgSrc) => {
     }
 }
 
-const listAllRoom = async () => {
+const listAllRoom = async (filter = {}) => {
     try {
-        const rooms = await Room.find();
+        // const rooms = await Room.find();
+        const query = {}
+        if (filter.type) {
+            query.type = filter.type;
+        }
+        if (filter.price) {
+            query.price = filter.price;
+        }
+        if (filter.roomNumber) {
+            query.roomNumber = filter.roomNumber;
+        }
+        if (filter.isAvailable) {
+            query.isAvailable = filter.isAvailable;
+        }
+        const rooms = await Room.find(query);
         return rooms;
     } catch (error) {
         throw error({

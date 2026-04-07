@@ -7,19 +7,15 @@ const roomSchema = new mongoose.Schema({
     },
     roomNumber: {
         type: String,
-        required: true,
     },
     price: {
         type: Number,
-        required: true,
     },
-    type: {
-        type: String,
-        required: true,
+    variant: {
+        type: [String],
     },
     imgSrc: {
-        type: String,
-        required: true,
+        type: [String]  ,
     },
     status: {
         type: String,
