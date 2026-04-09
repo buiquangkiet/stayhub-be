@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const generateToken = (user) => {
     console.log(user.role)
-    return jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 }
 
 const createUser = async (name, email, password, role) => {
@@ -15,7 +15,7 @@ const createUser = async (name, email, password, role) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashedPassword, role });
-    return { name: user.name, email: user.email, id: user._id };
+    return { name: user.name, email: user.email, id: user._id, isActive: user.isActive };
 };
 
 const list = async () => {
@@ -29,7 +29,7 @@ const list = async () => {
 
 const login = async (email, password) => {
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email, isActive: true });
         if (!user) {
             throw new Error("User not found");
         }
@@ -42,7 +42,7 @@ const login = async (email, password) => {
         }
         const token = generateToken(user);
         console.log("User logined", { name: user.name, email: user.email, role: user.role })
-        return { name: user.name, email: user.email, token };
+        return { name: user.name, email: user.email, role: user.role, token, _id: user._id };
     } catch (error) {
         throw error;
     }
@@ -70,4 +70,23 @@ const resetPassword = async (email, password) => {
 };
 
 
-module.exports = { createUser, resetPassword, forgotPassword, login, list };
+const activateUser = async (id) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            throw new Error("Không tìm thấy người dùng");
+        }
+        user.isActive = true;
+        await user.save();
+        return {
+            message: "Kích hoạt tài khoản thành công",
+            isActive: user.isActive,
+            userId: user._id
+        };
+    } catch (error) {
+        throw new Error(`Kích hoạt tài khoản thất bại: ${error.message}`);
+    }
+};
+
+
+module.exports = { createUser, resetPassword, forgotPassword, login, list, activateUser };

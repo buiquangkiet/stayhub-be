@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 
 const tenantSchema = new mongoose.Schema({
     roomId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
+        type: String,
+    },
+    email: {
+        type: String,
     },
     fullName: {
         type: String,
@@ -21,18 +23,9 @@ const tenantSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    deposit: {
-        type: Number,
-    },
     isActive: {
         type: Boolean,
-        default: true,
-    },
-    startDate: {
-        type: Date,
-    },
-    endDate: {
-        type: Date,
+        default: false,
     },
 }, { timestamps: true });
 

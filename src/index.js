@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv");
 const dns = require("node:dns");
 dns.setDefaultResultOrder("ipv4first");
@@ -13,8 +14,8 @@ const app = express();
 
 const route = require("./routes");
 
+app.use(cors());
 app.use(express.json());
-
 app.use("/api", route);
 
 app.use((err, req, res, next) => {

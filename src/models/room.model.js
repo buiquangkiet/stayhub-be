@@ -11,11 +11,19 @@ const roomSchema = new mongoose.Schema({
     price: {
         type: Number,
     },
-    variant: {
+    maxOccupants: {
+        type: Number,
+        default: 1,
+    },
+    vehicleCount: {
+        type: Number,
+        default: 0,
+    },
+    services: {
         type: [String],
     },
     imgSrc: {
-        type: [String]  ,
+        type: [String],
     },
     status: {
         type: String,

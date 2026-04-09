@@ -8,5 +8,5 @@ router.post("/create", authMiddleware, verifyAdmin, tenantController.createTenan
 router.get("/list", authMiddleware, verifyAdmin, tenantController.listTenant);
 router.put("/update/:id", authMiddleware, verifyAdmin, tenantController.updateTenant);
 router.put("/delete/:id", authMiddleware, verifyAdmin, tenantController.softDeleteTenant);
-
+router.put("/activate/:id", authMiddleware, verifyAdmin, tenantController.activateTenant);
 module.exports = router;

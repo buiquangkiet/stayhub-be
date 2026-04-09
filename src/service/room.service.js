@@ -1,15 +1,12 @@
 const tenantService = require("./tenant.service");
 const Room = require("../models/room.model");
 
-const createRoom = async (roomNumber, price, variant, imgSrc) => {
+const createRoom = async (roomNumber, price, maxOccupants, services, imgSrc) => {
     try {
-        const room = await Room.create({ roomNumber, price, variant, imgSrc });
+        const room = await Room.create({ roomNumber, price, maxOccupants, services, imgSrc });
         return room;
     } catch (error) {
-        throw error({
-            message: "Error creating room",
-            error: error.message,
-        });
+        throw new Error(error.message);
     }
 }
 
@@ -17,6 +14,7 @@ const listAllRoom = async (filter = {}) => {
     try {
         // const rooms = await Room.find();
         const query = {}
+        // query.isAvailable = true;
         if (filter.type) {
             query.type = filter.type;
         }
@@ -51,12 +49,12 @@ const getRoomById = async (roomId) => {
     }
 }
 
-const updateRoom = async (id, { roomNumber, price, type }) => {
+const updateRoom = async (id, data) => {
     try {
-        const room = await Room.findByIdAndUpdate(id, { roomNumber, price, type }, { new: true });
+        const room = await Room.findByIdAndUpdate(id, data, { new: true });
         return room;
     } catch (error) {
-        throw Error("Error updating room");
+        throw new Error("Error updating room");
     }
 }
 

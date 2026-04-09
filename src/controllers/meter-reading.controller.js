@@ -5,9 +5,16 @@ const create = async (req, res, next) => {
         const { roomId,oldElectricMeter, newElectricMeter, oldWaterMeter, newWaterMeter, month, year } = req.body;
 
         const result = await meterReadingService.create(roomId, oldElectricMeter, newElectricMeter, oldWaterMeter, newWaterMeter, month, year);
-      
+        
+        if (result.data === null) {
+            return res.status(400).json({
+                message: "Chỉ được tạo 1 lần, vui lòng chỉnh lại chỉ số bên dưới !!!",
+                data: null
+            });
+        }
+
         return res.status(201).json({
-            message: result.message,
+            message: "Thêm chỉ số thành công",
             data: result.data
         });
     } catch (error) {
@@ -42,4 +49,29 @@ const getMeterReadingByRoomId = async (req, res, next) => {
     }
 }
 
-module.exports = { create, update, getMeterReadingByRoomId };
+const listAll = async (req, res) => {
+    try {
+        const result = await meterReadingService.listAll();
+        return res.status(200).json({
+            message: "All meter readings fetched successfully",
+            data: result
+        });
+    } catch (error) {
+        return res.status(400).json({ message: "Error listing meter readings", error: error.message });
+    }
+}
+
+const deleteMeterReading = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const result = await meterReadingService.deleteMeterReading(id);
+        return res.status(200).json({
+            message: "Meter reading deleted successfully",
+            data: result
+        });
+    } catch (error) {
+        return res.status(400).json({ message: "Error deleting meter reading", error: error.message });
+    }
+}
+
+module.exports = { create, update, getMeterReadingByRoomId, listAll, deleteMeterReading };

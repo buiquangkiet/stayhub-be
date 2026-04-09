@@ -1,8 +1,9 @@
+const mongoose = require("mongoose");
 const Tenant = require("../models/tenant.model");
 
 const listTenant = async () => {
     try {
-        const tenants = await Tenant.find();
+        const tenants = await Tenant.find({ isActive: true });
         if (!tenants) {
             throw new Error("Tenants not found");
         }
@@ -15,7 +16,7 @@ const listTenant = async () => {
 
 const getTenantById = async (id) => {
     try {
-        const tenant = await Tenant.find({id});
+        const tenant = await Tenant.find({ id });
         if (!tenant) {
             throw new Error("Tenant not found");
         }
@@ -25,63 +26,62 @@ const getTenantById = async (id) => {
     }
 };
 
-const createTenant = async (name, email, password, phone, address) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
+const createTenant = async (fullName, email, phone, address, idCard, roomId) => {
     try {
-        const tenant = await Tenant.create([{
-            name,
+        // Kiểm tra roomId nếu có gửi lên
+        if (roomId && !mongoose.Types.ObjectId.isValid(roomId)) {
+            throw new Error("Mã phòng (roomId) không hợp lệ");
+        }
+
+        const tenant = await Tenant.create({
+            roomId: roomId || null,
+            fullName,
             phone,
-            address
-        }], { session });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = await User.create([{
-            name,
+            address,
             email,
-            password: hashedPassword,
-            tenantId: tenant[0]._id,
-            role: "owner"
-        }], { session });
-
-        await session.commitTransaction();
-
-        const token = generateToken(user[0]);
+            idCard,
+        });
 
         return {
-            message: "Register success",
-            token
-        };
+            message: "Tạo khách thuê thành công",
+            tenantId: tenant._id,
+        }
 
     } catch (error) {
-        await session.abortTransaction();
-        throw error;
+        throw new Error(`Tạo khách thuê thất bại: ${error.message}`);
     }
 };
 
-const updateTenant = async (id, name, email, password, phone, address) => {
+const updateTenant = async (id, fullName, email, phone, address, idCard, roomId, avatar) => {
     try {
         const tenant = await Tenant.findById(id);
         if (!tenant) {
-            throw new Error("Tenant not found");
+            throw new Error("Không tìm thấy khách thuê");
         }
-        
-        if (name) tenant.name = name;
+
+        if (fullName) tenant.fullName = fullName;
         if (email) tenant.email = email;
-        if (password) tenant.password = password;
         if (phone) tenant.phone = phone;
         if (address) tenant.address = address;
-        
+        if (idCard) tenant.idCard = idCard;
+
+        if (roomId) {
+            if (!mongoose.Types.ObjectId.isValid(roomId)) {
+                throw new Error("Mã phòng (roomId) không hợp lệ");
+            }
+            tenant.roomId = roomId;
+        }
+
+        if (avatar) tenant.avatar = avatar;
+
         await tenant.save();
         return {
-            message: "Tenant updated successfully",
+            message: "Cập nhật khách thuê thành công",
             tenantId: tenant._id,
-            name: tenant.name,
+            fullName: tenant.fullName,
         };
     } catch (error) {
-        throw new Error(`Failed to update tenant: ${error.message}`);
+        throw new Error(`Cập nhật khách thuê thất bại: ${error.message}`);
     }
 };
 
@@ -89,18 +89,36 @@ const softDeleteTenant = async (id) => {
     try {
         const tenant = await Tenant.findById(id);
         if (!tenant) {
-            throw new Error("Tenant not found");
+            throw new Error("Không tìm thấy khách thuê");
         }
         tenant.isActive = false; // Xóa mềm
         await tenant.save();
         return {
-            message: "Tenant deleted successfully",
+            message: "Xóa khách thuê thành công",
             isActive: tenant.isActive,
             tenantId: tenant._id,
         };
     } catch (error) {
-        throw new Error(`Failed to delete tenant: ${error.message}`);
+        throw new Error(`Xóa khách thuê thất bại: ${error.message}`);
     }
 };
 
-module.exports = { createTenant, updateTenant, softDeleteTenant, listTenant, getTenantById };
+const activateTenant = async (id) => {
+    try {
+        const tenant = await Tenant.findById(id);
+        if (!tenant) {
+            throw new Error("Không tìm thấy hồ sơ khách thuê");
+        }
+        tenant.isActive = true;
+        await tenant.save();
+        return {
+            message: "Kích hoạt hồ sơ khách thuê thành công",
+            isActive: tenant.isActive,
+            tenantId: tenant._id,
+        };
+    } catch (error) {
+        throw new Error(`Kích hoạt hồ sơ khách thuê thất bại: ${error.message}`);
+    }
+};
+
+module.exports = { createTenant, updateTenant, softDeleteTenant, listTenant, getTenantById, activateTenant };

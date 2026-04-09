@@ -2,8 +2,8 @@ const roomService = require("../service/room.service");
 
 const createRoom = async (req, res) => {
     try {
-        const { roomNumber, price, variant, imgSrc } = req.body;
-        const room = await roomService.createRoom(roomNumber, price, variant, imgSrc);
+        const { roomNumber, price, maxOccupants, services, imgSrc } = req.body;
+        const room = await roomService.createRoom(roomNumber, price, maxOccupants, services, imgSrc);
         res.status(201).json(room);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,8 +33,7 @@ const getRoomById = async (req, res) => {
 const updateRoom = async (req, res) => {
     try {
         const { id } = req.params;
-        const { roomNumber, price, type } = req.body;
-        const room = await roomService.updateRoom(id, { roomNumber, price, type });
+        const room = await roomService.updateRoom(id, req.body);
         res.status(200).json(room);
     } catch (error) {
         res.status(500).json({ message: error.message });

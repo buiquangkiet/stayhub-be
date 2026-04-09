@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+    tenantId: {
+        type: String,
+    },
     name: {
         type: String,
         required: true,
@@ -21,7 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     isActive: {
         type: Boolean,
-        default: true,
+        default: false,
     },
 }, { timestamps: true });
 
