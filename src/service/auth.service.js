@@ -88,5 +88,36 @@ const activateUser = async (id) => {
     }
 };
 
+const updateUser = async (id, data) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) throw new Error("Không tìm thấy người dùng");
 
-module.exports = { createUser, resetPassword, forgotPassword, login, list, activateUser };
+        if (data.name) user.name = data.name;
+        if (data.email) user.email = data.email;
+        if (data.role) user.role = data.role;
+        if (data.isActive !== undefined) user.isActive = data.isActive;
+        // Optionally update password if provided
+        if (data.password) {
+            user.password = await bcrypt.hash(data.password, 10);
+        }
+        await user.save();
+        return { id: user._id, name: user.name, email: user.email, role: user.role, isActive: user.isActive };
+    } catch (error) {
+        throw error;
+    }
+};
+
+const deleteUser = async (id) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) throw new Error("Không tìm thấy người dùng");
+        user.isActive = false;
+        await user.save();
+        return { message: "Đã xóa người dùng thành công" };
+    } catch (error) {
+        throw error;
+    }
+};
+
+module.exports = { createUser, resetPassword, forgotPassword, login, list, activateUser, updateUser, deleteUser };

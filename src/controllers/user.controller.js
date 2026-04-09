@@ -71,4 +71,25 @@ const activateUser = async (req, res, next) => {
     }
 };
 
-module.exports = { createUser, changePassword, login, forgotPassword, list, activateUser };
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        const user = await authService.updateUser(id, data);
+        res.status(200).json({ message: "Cập nhật người dùng thành công", user });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await authService.deleteUser(id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+module.exports = { createUser, changePassword, login, forgotPassword, list, activateUser, updateUser, deleteUser };
